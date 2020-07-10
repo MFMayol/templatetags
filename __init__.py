@@ -14,18 +14,24 @@ limitede = ancho + espacciofuera
 limiteabajo = -espacciofuera
 limitearriba = ancho + espacciofuera
 
-
+#Creamos clase para definir el giro de Miguel
 class spritegiro(arcade.Sprite):
     def update(self):
         super().update()
         self.angle = math.degrees(math.atan2(self.change_y, self.change_x))
 
 
+
+#Clase para Miguel
 class elmaster(arcade.Sprite):
+                                            #def __init__ es una función especial llamada "constructor"
+                                            #self "mi" nos referimos al campo de dirección (no se puede poner en una def distinta)
+                                            #método= función dentro de una clase, definimos los atributos primero con el init y luego los métodos
+
 
     def __init__(self, archivo, escala):
         super().__init__(archivo, escala)
-
+       #Método que establece las variables/variable del personaje
         self.thrust = 0
         self.speed = 0
         self.max_speed = 4
@@ -33,13 +39,15 @@ class elmaster(arcade.Sprite):
         self.respawning = 0
         self.respawn()
 
-        #definimos el respawn
+    #método para el respawn
     def respawn(self):
+        #posición del respawn
         self.respawning = 1
         self.center_x = ancho / 2
         self.center_y = largo / 2
         self.angle = 0
-        #definimos el movimiento del personaje
+
+    #método para el movimiento del personaje
     def update(self):
         if self.respawning:
             self.respawning += 1
@@ -82,6 +90,8 @@ class elmaster(arcade.Sprite):
 
         super().update()
 
+
+
 #definimos los covids
 class covidsprite(arcade.Sprite):
     def __init__(self, archivocovid, escala):
@@ -99,13 +109,17 @@ class covidsprite(arcade.Sprite):
         if self.center_y < limiteabajo:
             self.center_y = limitearriba
 
-
+#clase para hacer la ventana
 class juego(arcade.Window):
 
     vida: object
 
     def __init__(self):
+
+    #super() llama a la clase "constructora padre"   (HERENCIA)
         super().__init__(ancho, largo, titulo)
+
+        #agregamos variables/datos
 
         self.player_sprite_list = arcade.SpriteList()
         file_path = os.path.dirname(os.path.abspath(__file__))
@@ -115,6 +129,7 @@ class juego(arcade.Window):
         self.frame_count = 0
 
         self.fin = False
+
 
         # listas de sprites
         self.listajugador = arcade.SpriteList()
@@ -159,11 +174,14 @@ class juego(arcade.Window):
             cur_pos += vida.width
             self.listavidas.append(vida)
         image_list = (":resources:images/enemies/slimePurple.png", ":resources:images/enemies/wormPink.png")
+
+        #Elige qué tipo de covid respawnear (hay 2 modelos de covid)
         for i in range(covids):
             image_no = random.randrange(2)
             enemigosprite = covidsprite(image_list[image_no], escala)
             enemigosprite.guid = "covid"
 
+            #lugar de aparición al azar
             enemigosprite.center_y = random.randrange(limiteabajo, limitearriba)
             enemigosprite.center_x = random.randrange(limiteizq, limitede)
 
@@ -175,7 +193,7 @@ class juego(arcade.Window):
             self.listacovid.append(enemigosprite)
 
     def on_draw(self):
-        #comenzamos a dibujar
+        #comenzamos a dibujar(método)
         arcade.start_render()
         #dibuja cada lista
         self.listacovid.draw()
@@ -193,10 +211,13 @@ class juego(arcade.Window):
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.M:
             playsound.playsound(self.musikita_sound)
+
+        #agregamos el sprite disparo
         if not self.jugador.respawning and symbol == arcade.key.SPACE:
             balasprite = spritegiro(":resources:images/space_shooter/laserBlue01.png", escala)
             balasprite.guid = "Bullet"
 
+            #velocidad de la bala
             balavel = 13
             balasprite.change_y = \
                 math.cos(math.radians(self.jugador.angle)) * balavel
@@ -223,7 +244,7 @@ class juego(arcade.Window):
             self.jugador.thrust = -.2
 
     def on_key_release(self, symbol, modifiers):
-        """     Cuando sueltas las teclas, lo agregamos con la retroalimentacion de gonzalo y el profesor  """
+        """     Cuando sueltas las teclas, lo agregamos con la retroalimentación de gonzalo y el profesor  """
         if symbol == arcade.key.LEFT:
             self.jugador.change_angle = 0
         elif symbol == arcade.key.RIGHT:
@@ -233,6 +254,7 @@ class juego(arcade.Window):
         elif symbol == arcade.key.DOWN:
             self.jugador.thrust = 0
 
+#update= actualiza atributos
     def on_update(self, x):
         self.frame_count += 1
 
@@ -269,8 +291,8 @@ class juego(arcade.Window):
                         self.listavidas.pop().remove_from_sprite_lists()
                         print("contagio")
 
-                    #cuando el juego termina
                     else:
+
                         self.fin = True
                         print("Fin del juego")
 
@@ -279,7 +301,7 @@ class juego(arcade.Window):
 
 
 def main():
-    """ Start the game """
+    #Comenzamos el juego
     window = juego()
     window.start_new_game()
     arcade.run()
